@@ -38,16 +38,16 @@ def invokeLambda(psList):
 
             lock.release()
 
-            return pslov
+            return "*"
 
         lock.release()
 
-        return pslov
+        return "-"
 
     except:
         #print("network error")
         #raise Exception
-        return "network error"
+        return "x"
 
 def writePolygonToFile(filename, polygon):
     path_to_filename = os.path.join("/tmp",filename)
@@ -82,7 +82,7 @@ def launch(cycles, vertexlist):
     pool = Pool(num_cores)
     
     for p in pool.imap_unordered(invokeLambda, vertexToList(cycles, vertexlist)):
-        print(p)
+        print(p,end='',flush=True)
     
 
 if __name__=="__main__":
