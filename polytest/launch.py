@@ -15,9 +15,14 @@ def invokeLambda(psList):
     try:
         r = requests.get("https://afexwi4dg8.execute-api.eu-west-3.amazonaws.com/api/polygon/%s"%(psList))
         
-        pslov = json.loads(r.json()["result"])
-        pslov = pslov["vertex"]
+        try:
+            pslov = json.loads(r.json()["result"])
+            pslov = pslov["vertex"]
         
+        except:
+            #print("Stuck!",r.json())
+            return "!"
+
         psreverse = pslov[:]
         psreverse.reverse()
 
@@ -39,10 +44,10 @@ def invokeLambda(psList):
 
         return pslov
 
-    except Exception:
-        print("network error")
+    except:
+        #print("network error")
         #raise Exception
-        return {}
+        return "network error"
 
 def writePolygonToFile(filename, polygon):
     path_to_filename = os.path.join("/tmp",filename)
@@ -82,7 +87,7 @@ def launch(cycles, vertexlist):
 
 if __name__=="__main__":
 
-    cycles = 100000
+    cycles = 10000
     steps = 13
     g = spiral.Spiral(xzero=1,yzero=1)
     vertexlist = list(set(g.generate(steps=steps)))
