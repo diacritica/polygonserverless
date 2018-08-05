@@ -665,16 +665,24 @@ class PolygonStruct:
 
 def generate(vertexlist):
 
-    ps = PolygonStruct(vertexlist)
-    ps.setInitialVertex()
 
-    while not ps.allPointsUsed():
-        ps.cycle()
-        if ps.stuck:
-            return None
-        if ps.checkValidFinalPolygon():
-            ps.lov.append(ps.initialvertex)
-            return ps.getJSON()
+    num = 10
+    results = []
+
+    for i in range(num):
+        ps = PolygonStruct(vertexlist)
+        ps.setInitialVertex()
+
+        while not ps.allPointsUsed():
+            ps.cycle()
+            if ps.stuck:
+                break
+            if ps.checkValidFinalPolygon():
+                ps.lov.append(ps.initialvertex)
+                results.append(ps.getJSON())
+              
+                break
+    return results
 
 
 app = Chalice(app_name='polygon')

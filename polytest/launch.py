@@ -12,41 +12,43 @@ lock = Lock()
 
 
 def invokeLambda(psList):
+    global uniquepolygons
     try:
         r = requests.get("https://afexwi4dg8.execute-api.eu-west-3.amazonaws.com/api/polygon/%s"%(psList))
-        
+    
         try:
-            pslov = json.loads(r.json()["result"])
-            pslov = pslov["vertex"]
+            pslistlov = [json.loads(lov)["vertex"] for lov in r.json()["result"]]
         
-        except:
+        except Exception:
+            
             #print("Stuck!",r.json())
             return "!"
 
-        psreverse = pslov[:]
-        psreverse.reverse()
+        for pslov in pslistlov:
 
-        lock.acquire()
-        
-        if pslov not in uniquepolygons and psreverse not in uniquepolygons:
+            psreverse = pslov[:]
+            psreverse.reverse()
+
+            lock.acquire()
             
-            if pslov < psreverse:
-                uniquepolygons.append(pslov)
-            else:
-                pslov = psreverse
-                uniquepolygons.append(pslov)
+            if pslov not in uniquepolygons and psreverse not in uniquepolygons:
+                
+                if pslov < psreverse:
+                    uniquepolygons.append(pslov)
+                else:
+                    pslov = psreverse
+                    uniquepolygons.append(pslov)
+
+                lock.release()
+
+                return "*"
 
             lock.release()
 
-            return "*"
+            return "-"
 
-        lock.release()
-
-        return "-"
-
-    except:
+    except Exception:
         #print("network error")
-        #raise Exception
         return "x"
 
 def writePolygonToFile(filename, polygon):
@@ -87,11 +89,12 @@ def launch(cycles, vertexlist):
 
 if __name__=="__main__":
 
-    cycles = 10000
+    cycles = 1000
     steps = 13
     g = spiral.Spiral(xzero=1,yzero=1)
     vertexlist = list(set(g.generate(steps=steps)))
     #vertexlist = [(0,0),(10,10),(10,0),(0,10),(5,6)]
+    print("https://afexwi4dg8.execute-api.eu-west-3.amazonaws.com/api/polygon/%s"%(vertexToOneStrList(vertexlist)))
 
     launch(cycles, vertexlist)
     print("\n\n------------>\n\n",uniquepolygons,len(uniquepolygons))
