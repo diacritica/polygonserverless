@@ -80,7 +80,7 @@ def mcLaunch(cycles, vertexlist):
 
 def launch(cycles, vertexlist):
 
-    num_cores = cpu_count() -1
+    num_cores = min(1, cpu_count() -1)
     pool = Pool(num_cores)
     
     for p in pool.imap_unordered(invokeLambda, vertexToList(cycles, vertexlist)):
